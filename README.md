@@ -24,5 +24,3 @@ them and picking up people who need to in the same direction in which the elevat
 Also, if the elevator is not fully loaded, it can stop on the floor where there is
 people who need to go in the same direction.
 
-When boarding new passengers, the maximum floor is recalculated.
-
