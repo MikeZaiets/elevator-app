@@ -53,14 +53,14 @@ public class ElevatorServiceImpl implements ElevatorService {
         if (elevator.getPassengers().isEmpty()) {
             return true;
         }
-        return Collections.max(getPassengersTargetFloors(elevator)) > currentFloor.getFloorNumber();
+        return Collections.max(getPassengersTargetFloors(elevator)) >= currentFloor.getFloorNumber();
     }
 
     private boolean isExistPassengersOnUpperFloor(Floor currentFloor) {
         return buildingData.getFloors()
                 .stream()
                 .flatMap(floor -> floor.getPeople().stream())
-                .anyMatch(person -> person.getStartFloor() > currentFloor.getFloorNumber());
+                .anyMatch(person -> person.getStartFloor() >= currentFloor.getFloorNumber());
     }
 
     @SneakyThrows
@@ -86,7 +86,7 @@ public class ElevatorServiceImpl implements ElevatorService {
         if (elevator.getPassengers().isEmpty()) {
             return true;
         }
-        return Collections.min(getPassengersTargetFloors(elevator)) < currentFloor.getFloorNumber();
+        return Collections.min(getPassengersTargetFloors(elevator)) <= currentFloor.getFloorNumber();
     }
 
     private Set<Integer> getPassengersTargetFloors(Elevator elevator) {
@@ -100,13 +100,22 @@ public class ElevatorServiceImpl implements ElevatorService {
         return buildingData.getFloors()
                 .stream()
                 .flatMap(floor -> floor.getPeople().stream())
-                .anyMatch(person -> person.getStartFloor() < currentFloor.getFloorNumber());
+                .anyMatch(person -> person.getStartFloor() <= currentFloor.getFloorNumber());
     }
 
     private void processMoveElevator(Floor currentFloor, Elevator elevator) throws InterruptedException {
+        if (isPeopleAbsent()) {
+            System.exit(0);
+        }
         Thread.sleep(elevator.getWaitingInterval());
         peopleService.putPassengersOutElevator(currentFloor, buildingData);
         peopleService.putPassengersToElevator(currentFloor, buildingData);
         printerService.printStep(buildingData);
+    }
+
+    private boolean isPeopleAbsent() {
+        long countPeopleInBuilding = buildingData.getFloors().stream().mapToLong(floor -> floor.getPeople().size()).sum();
+        long countPeopleInElevator = buildingData.getElevator().getPassengers().size();
+        return countPeopleInBuilding + countPeopleInElevator == 0;
     }
 }

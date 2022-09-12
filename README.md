@@ -1,4 +1,4 @@
-## Elevator in the building
+## Elevator application
 
 Application without UI (console).
 
